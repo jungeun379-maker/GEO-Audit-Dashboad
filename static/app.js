@@ -1,71 +1,13 @@
 import React from "react";
 import { createRoot } from "react-dom/client";
 import htm from "htm";
+import { SVG,WHY,SL,CIMAP,ALL_CHECKS,GUIDE,OC,INTRO_ITEMS } from "./app-data.js";
 const html = htm.bind(React.createElement);
 const { useState, useEffect, useRef, useCallback } = React;
-
-const SVG = {
-  meta_title:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 10h10M7 14h6"/></svg>`,
-  meta_desc:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>`,
-  h1:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h1v12M4 12h8M13 6h1v12M19 6v12"/></svg>`,
-  h2:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h1v12M4 12h7M12 6h1v12M17 11c0-1.1.9-2 2-2s2 .9 2 2c0 1-1 2-3 4h4"/></svg>`,
-  hreflang:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
-  canonical:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>`,
-  html_lang:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>`,
-  og_tags:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>`,
-  schema:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>`,
-  robots:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/><circle cx="12" cy="16" r="1"/></svg>`,
-  check:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`,
-  warn_tri:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
-  x_circle:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
-  chevron_down:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>`,
-  chevron_up:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>`,
-  download:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>`,
-  search:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>`,
-  globe:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>`,
-  zap:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
-  stop:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/></svg>`,
-  info:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`,
-  trophy:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="8 21 12 17 16 21"/><line x1="12" y1="17" x2="12" y2="11"/><path d="M6 3h12l-1 7a5 5 0 0 1-10 0z"/><path d="M5 3H3v4a3 3 0 0 0 3 3M19 3h2v4a3 3 0 0 1-3 3"/></svg>`,
-  tag:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" y1="7" x2="7.01" y2="7"/></svg>`,
-};
 
 function Icon({name,size=16}){
   return html`<span style=${{display:"inline-flex",alignItems:"center",justifyContent:"center",width:size,height:size,flexShrink:0}} dangerouslySetInnerHTML=${{__html:SVG[name]||SVG.info}}/>`;
 }
-
-const WHY={
-  meta_title_fail:{why:"title 태그가 페이지에 존재하지 않습니다.",impact:"검색 결과에서 페이지 제목이 표시되지 않아 CTR이 크게 낮아집니다."},
-  meta_title_warn:{why:"메타 타이틀 길이가 권장 범위(30~60자)를 벗어났습니다.",impact:"너무 짧으면 키워드 전달력 부족, 너무 길면 검색 결과에서 말줄임으로 잘립니다."},
-  meta_desc_fail:{why:"meta description 태그가 페이지에 존재하지 않습니다.",impact:"검색 결과 스니펫이 자동 생성되어 원하는 메시지 전달이 불가능해집니다."},
-  meta_desc_warn:{why:"메타 디스크립션 길이가 권장 범위(70~160자)를 벗어났습니다.",impact:"너무 짧으면 정보 전달 부족, 너무 길면 검색 결과에서 잘려 표시됩니다."},
-  h1_fail:{why:"H1 태그가 페이지에 존재하지 않습니다.",impact:"검색엔진이 페이지의 주요 주제를 파악하기 어려워 SEO 순위에 부정적 영향을 미칩니다."},
-  h1_warn:{why:"H1 태그가 2개 이상 존재합니다.",impact:"페이지 주제가 분산된 것으로 인식되어 SEO에 불리합니다."},
-  h2_warn:{why:"H2 태그가 존재하지 않습니다.",impact:"콘텐츠 구조가 불명확해 검색엔진이 세부 내용을 파악하기 어렵습니다."},
-  hreflang_warn:{why:"hreflang 태그가 없거나 자기참조가 확인되지 않습니다.",impact:"다국가 검색에서 잘못된 언어/국가 페이지가 노출될 수 있습니다."},
-  canonical_fail:{why:"canonical 태그가 페이지에 존재하지 않습니다.",impact:"중복 URL이 별개 페이지로 인식되어 PageRank가 분산됩니다."},
-  html_lang_fail:{why:"html 태그에 lang 속성이 없습니다.",impact:"검색엔진이 페이지 언어를 정확히 판단하지 못해 엉뚱한 국가 결과에 노출될 수 있습니다."},
-  og_tags_warn:{why:"og:title/og:description/og:image/og:url 중 일부가 누락되었습니다.",impact:"SNS 공유 시 미리보기가 제대로 표시되지 않아 유입 트래픽이 감소합니다."},
-  og_tags_fail:{why:"Open Graph 태그가 전혀 없습니다.",impact:"SNS 공유 시 미리보기가 생성되지 않아 소셜 채널 유입에 큰 손실이 발생합니다."},
-  schema_fail:{why:"Schema.org @id 교차참조 오류 또는 구조화 데이터 누락입니다.",impact:"Rich Snippet 노출 기회를 잃고 AI 검색(AEO) 대응력이 크게 저하됩니다."},
-  schema_warn:{why:"@id 미선언 또는 WebPage @id와 canonical 불일치 등 경고 항목이 있습니다.",impact:"구조화 데이터 신뢰도가 낮아져 Rich Snippet 노출 확률이 감소합니다."},
-  robots_fail:{why:"meta robots 태그에 noindex가 설정되어 있습니다.",impact:"검색엔진이 이 페이지를 색인하지 않아 검색 결과에 전혀 노출되지 않습니다."},
-};
-
-const SL={pass:"정상",warn:"경고",fail:"실패"};
-const CIMAP={meta_title:"meta_title",meta_desc:"meta_desc",h1:"h1",h2:"h2",hreflang:"hreflang",canonical:"canonical",html_lang:"html_lang",og_tags:"og_tags",schema:"schema",robots:"robots"};
-const ALL_CHECKS=[{id:"meta_title",label:"메타 타이틀"},{id:"meta_desc",label:"메타 디스크립션"},{id:"h1",label:"H1 태그"},{id:"h2",label:"H2 태그"},{id:"hreflang",label:"hreflang"},{id:"canonical",label:"Canonical"},{id:"html_lang",label:"HTML lang"},{id:"og_tags",label:"Open Graph"},{id:"schema",label:"Schema.org"},{id:"robots",label:"Robots / noindex"}];
-
-const GUIDE=[
-  {s:"메타 태그",ic:"meta_title",rows:[["메타 타이틀","필수 존재, 권장 30~60자"],["메타 디스크립션","필수 존재, 권장 70~160자"]]},
-  {s:"헤딩 구조",ic:"h1",rows:[["H1","정확히 1개 권장 (0개=실패, 2개 이상=경고)"],["H2","1개 이상 권장"]]},
-  {s:"Canonical / lang",ic:"canonical",rows:[["Canonical","canonical 태그 필수 존재"],["HTML lang","html 태그에 lang 속성 필수"]]},
-  {s:"Open Graph",ic:"og_tags",rows:[["OG 태그","og:title/og:description/og:image/og:url 4종 권장"]]},
-  {s:"구조화 데이터",ic:"schema",rows:[["Schema.org","JSON-LD 구조화 데이터 권장"],["@id 보유","주요 엔티티에 @id 선언 필요"],["@id 교차참조","참조 프로퍼티가 선언된 @id를 가리켜야 함"],["WebPage @id ↔ canonical","일치해야 함"]]},
-  {s:"크롤링 설정",ic:"robots",rows:[["robots/noindex","noindex 설정 시 검색엔진 미노출 — 즉시 확인 필요"]]},
-];
-
-const OC=[["정상 (pass)","미흡 항목 0개"],["경고 (warn)","미흡 항목 1~2개"],["실패 (fail)","페이지 접근 불가 또는 미흡 항목 3개 이상"]];
 
 function extractLabel(url){try{const u=new URL(url);const s=u.pathname.split("/").filter(Boolean)[0];return s||u.hostname;}catch{return url;}}
 async function auditOne(url){const r=await fetch("/api/audit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url})});if(!r.ok)throw new Error(`서버 오류 (HTTP ${r.status})`);return r.json();}
@@ -95,6 +37,88 @@ function SecHeader({name,status}){return html`<div style=${{padding:"10px 16px",
   </div>
   <${Badge} status=${status}/>
 </div>`;}
+
+function IntroPanel(){
+  return html`<div class="fade-in" style=${{padding:"4px 0 20px"}}>
+    <div style=${{background:"linear-gradient(135deg,#1428A0 0%,#2B3FBB 100%)",borderRadius:16,padding:"28px 28px 24px",marginBottom:20,color:"#fff"}}>
+      <div style=${{display:"flex",alignItems:"center",gap:12,marginBottom:16}}>
+        <div style=${{width:44,height:44,borderRadius:13,background:"rgba(255,255,255,0.15)",display:"flex",alignItems:"center",justifyContent:"center"}}><${Icon} name="zap" size=${22}/></div>
+        <div>
+          <div style=${{fontSize:10,letterSpacing:"0.12em",opacity:0.65,fontWeight:500,marginBottom:2}}>SAMSUNG SEO · AEO</div>
+          <div style=${{fontSize:20,fontWeight:700,letterSpacing:"-0.02em"}}>페이지 품질 검수 도구</div>
+        </div>
+      </div>
+      <p style=${{fontSize:13,lineHeight:1.75,color:"rgba(255,255,255,0.82)",margin:0}}>삼성닷컴 제품 페이지의 <strong style=${{color:"#fff"}}>검색엔진 최적화(SEO)</strong>와 <strong style=${{color:"#fff"}}>AI 검색 대응(AEO)</strong> 현황을 자동 분석합니다. URL을 입력하면 10개 항목을 일괄 점검하고 개선 방향을 제시합니다.</p>
+      <div style=${{marginTop:16,display:"flex",gap:8,flexWrap:"wrap"}}>
+        ${[["10개 항목 자동 점검","check"],["오류 원인 및 영향 분석","info"],["JSON-LD 파싱 오류 감지","tool"],["다국가 일괄 검수 지원","globe"]].map(([t,ic])=>html`
+          <div key=${t} style=${{display:"flex",alignItems:"center",gap:6,background:"rgba(255,255,255,0.12)",borderRadius:99,padding:"5px 12px"}}>
+            <${Icon} name=${ic} size=${12}/><span style=${{fontSize:11,fontWeight:600}}>${t}</span>
+          </div>
+        `)}
+      </div>
+    </div>
+    <div style=${{marginBottom:10,fontSize:11,fontWeight:700,color:"var(--text-tertiary)",letterSpacing:"0.06em",padding:"0 2px"}}>검수 항목 안내</div>
+    <div style=${{display:"grid",gridTemplateColumns:"1fr 1fr",gap:10}}>
+      ${INTRO_ITEMS.map(item=>html`
+        <div key=${item.id} class="card" style=${{padding:"14px 14px 12px"}}>
+          <div style=${{display:"flex",alignItems:"center",gap:8,marginBottom:8}}>
+            <div style=${{width:28,height:28,borderRadius:8,background:"var(--navy-dim)",display:"flex",alignItems:"center",justifyContent:"center",color:"var(--navy)",flexShrink:0}}>
+              <${Icon} name=${CIMAP[item.id]||"info"} size=${14}/>
+            </div>
+            <div>
+              <div style=${{fontSize:12,fontWeight:700,color:"var(--navy)"}}>${item.label}</div>
+              <div style=${{fontSize:10,color:"var(--text-tertiary)"}}>${item.criteria}</div>
+            </div>
+          </div>
+          <p style=${{fontSize:11,lineHeight:1.65,color:"var(--text-secondary)",margin:0}}>${item.desc}</p>
+        </div>
+      `)}
+    </div>
+  </div>`;
+}
+
+function ParseFailurePanel({blocks}){
+  if(!blocks||!blocks.length)return null;
+  const[openIdx,sOpen]=useState(null);
+  return html`<div style=${{margin:"0 12px 8px",borderRadius:12,overflow:"hidden",border:"1.5px solid var(--red)",background:"var(--red-bg)"}}>
+    <div style=${{padding:"10px 13px 8px",borderBottom:"1px solid rgba(255,59,48,0.15)"}}>
+      <div style=${{display:"flex",alignItems:"center",gap:7,marginBottom:3}}>
+        <${Icon} name="x_circle" size=${15}/>
+        <span style=${{fontSize:12,fontWeight:700,color:"var(--red-text)"}}>JSON-LD 파싱 오류 (${blocks.length}건)</span>
+      </div>
+      <p style=${{fontSize:11,color:"var(--red-text)",opacity:0.8,margin:0,lineHeight:1.5}}>구조화 데이터 코드에 문법 오류가 있습니다. 담당자 확인 후 즉시 수정이 필요합니다.</p>
+    </div>
+    ${blocks.map((b,i)=>html`
+      <div key=${i} style=${{borderTop:i>0?"1px solid rgba(255,59,48,0.12)":"none"}}>
+        <button style=${{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"9px 13px",background:"none",border:"none",cursor:"pointer",fontFamily:"inherit",textAlign:"left"}} onClick=${()=>sOpen(openIdx===i?null:i)}>
+          <div style=${{flex:1,minWidth:0}}>
+            <div style=${{fontSize:11,fontWeight:700,color:"var(--red-text)",marginBottom:2}}>블록 ${i+1} — ${b.error_type}</div>
+            ${b.location&&html`<div style=${{fontSize:10,color:"var(--red-text)",opacity:0.7}}>${b.location}</div>`}
+          </div>
+          <${Icon} name=${openIdx===i?"chevron_up":"chevron_down"} size=${14}/>
+        </button>
+        ${openIdx===i&&html`<div style=${{padding:"0 13px 12px",display:"flex",flexDirection:"column",gap:10}}>
+          <div style=${{fontSize:11,lineHeight:1.6,color:"var(--red-text)",background:"rgba(255,59,48,0.06)",borderRadius:7,padding:"8px 10px"}}>${b.fix_desc}</div>
+          ${(b.fix_before||b.fix_after)&&html`<div>
+            <div style=${{fontSize:10,fontWeight:700,color:"var(--text-tertiary)",marginBottom:5,letterSpacing:"0.05em"}}>수정 전 → 수정 후</div>
+            ${b.fix_before&&html`<div style=${{display:"flex",alignItems:"flex-start",gap:6,marginBottom:4}}>
+              <span style=${{fontSize:10,fontWeight:700,color:"var(--red-text)",flexShrink:0,marginTop:1}}>전</span>
+              <code style=${{fontSize:10,lineHeight:1.6,color:"var(--red-text)",background:"rgba(255,59,48,0.08)",borderRadius:5,padding:"3px 7px",wordBreak:"break-all",flex:1}}>${b.fix_before}</code>
+            </div>`}
+            ${b.fix_after&&html`<div style=${{display:"flex",alignItems:"flex-start",gap:6}}>
+              <span style=${{fontSize:10,fontWeight:700,color:"var(--green-text)",flexShrink:0,marginTop:1}}>후</span>
+              <code style=${{fontSize:10,lineHeight:1.6,color:"var(--green-text)",background:"rgba(52,199,89,0.08)",borderRadius:5,padding:"3px 7px",wordBreak:"break-all",flex:1}}>${b.fix_after}</code>
+            </div>`}
+          </div>`}
+          ${b.context&&html`<div>
+            <div style=${{fontSize:10,fontWeight:700,color:"var(--text-tertiary)",marginBottom:5,letterSpacing:"0.05em"}}>오류 위치 (▶ 표시 줄)</div>
+            <pre style=${{fontSize:10,lineHeight:1.6,color:"var(--text-primary)",background:"rgba(255,255,255,0.7)",borderRadius:7,padding:"8px 10px",overflowX:"auto",whiteSpace:"pre-wrap",wordBreak:"break-all",maxHeight:160,overflowY:"auto",margin:0,fontFamily:"monospace"}}>${b.context}</pre>
+          </div>`}
+        </div>`}
+      </div>
+    `)}
+  </div>`;
+}
 
 function Header({tab,setTab}){return html`<header style=${{background:"linear-gradient(135deg,#1428A0 0%,#2B3FBB 100%)",color:"#fff",flexShrink:0}}>
   <div style=${{padding:"14px 20px",display:"flex",alignItems:"center",justifyContent:"space-between"}}>
@@ -169,11 +193,6 @@ function CriteriaLegend(){
   </div>`;
 }
 
-function EmptyState(){return html`<div style=${{display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",height:"100%",minHeight:300,gap:12,color:"var(--text-tertiary)"}}>
-  <${Icon} name="search" size=${40}/>
-  <div style=${{textAlign:"center"}}><div style=${{fontSize:14,fontWeight:600,color:"var(--text-secondary)",marginBottom:4}}>검수 결과가 여기에 표시됩니다</div><div style=${{fontSize:12}}>왼쪽 입력창에 URL을 입력하고 검수하기를 눌러주세요</div></div>
-</div>`;}
-
 function MetaSection({tc,dc}){
   if(!tc&&!dc)return null;
   const st=worstStatus([tc,dc]);
@@ -246,23 +265,6 @@ function OGSection({c}){
   </div>`;
 }
 
-function FailedBlock({block,index}){
-  const[open,sO]=useState(false);
-  return html`<div style=${{background:"var(--red-bg)",borderRadius:9,marginBottom:6,overflow:"hidden"}}>
-    <button style=${{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"9px 12px",background:"none",border:"none",cursor:"pointer",fontFamily:"inherit"}} onClick=${()=>sO(!open)}>
-      <div style=${{display:"flex",alignItems:"center",gap:8}}>
-        <span style=${{width:6,height:6,borderRadius:"50%",background:"var(--red)",flexShrink:0}}></span>
-        <span style=${{fontSize:12,fontWeight:600,color:"var(--red-text)"}}>파싱 실패 블록 ${index+1}</span>
-        <span style=${{fontSize:11,color:"var(--red-text)",opacity:0.7}}>${block.error}</span>
-      </div>
-      <${Icon} name=${open?"chevron_up":"chevron_down"} size=${14}/>
-    </button>
-    ${open&&html`<div style=${{padding:"0 12px 12px"}}>
-      <pre style=${{fontSize:11,lineHeight:1.6,color:"var(--text-primary)",background:"rgba(255,255,255,0.7)",borderRadius:7,padding:"10px 12px",overflowX:"auto",whiteSpace:"pre-wrap",wordBreak:"break-all",maxHeight:300,overflowY:"auto",margin:0,fontFamily:"monospace"}}>${block.raw}</pre>
-    </div>`}
-  </div>`;
-}
-
 function SchemaSection({c}){
   if(!c)return null;
   const ents=c.extra_data?.entities||[];
@@ -284,14 +286,10 @@ function SchemaSection({c}){
           </div>
         </div>`)}
       </div>
-
-      ${failed.length>0&&html`<div style=${{borderTop:"0.5px solid var(--separator)",paddingTop:14}}>
-        <div style=${{fontSize:11,fontWeight:700,color:"var(--red-text)",marginBottom:8,display:"flex",alignItems:"center",gap:6}}>
-          <${Icon} name="x_circle" size=${13}/>파싱 실패 블록 (${failed.length}개) — 클릭하면 원본 코드 확인
-        </div>
-        ${failed.map((b,i)=>html`<${FailedBlock} key=${i} block=${b} index=${i}/>`)}
+      ${failed.length>0&&html`<div style=${{display:"flex",alignItems:"center",gap:8,padding:"10px 12px",background:"var(--red-bg)",borderRadius:9}}>
+        <${Icon} name="x_circle" size=${14}/>
+        <span style=${{fontSize:12,color:"var(--red-text)",fontWeight:600}}>파싱 실패 ${failed.length}건 — 좌측 패널에서 수정 방법 확인</span>
       </div>`}
-
       <div style=${{borderTop:"0.5px solid var(--separator)",paddingTop:14}}>
         <div style=${{fontSize:11,fontWeight:700,color:"var(--text-tertiary)",marginBottom:8}}>@id 교차참조 검증</div>
         ${refs.map((item,i)=>html`<div key=${i} style=${{display:"flex",alignItems:"flex-start",gap:8,padding:"5px 0",borderTop:i>0?"0.5px solid var(--separator)":"none"}}>
@@ -329,7 +327,7 @@ function GenericSection({name,checks}){
 }
 
 function DetailPanel({result}){
-  if(!result)return html`<${EmptyState}/>`;
+  if(!result)return html`<${IntroPanel}/>`;
   if(result.error&&!result.checks?.length)return html`<div class="card fade-in" style=${{borderLeft:"4px solid var(--red)",background:"var(--red-bg)",padding:"18px"}}><div style=${{display:"flex",gap:10}}><${Icon} name="x_circle" size=${20}/><div><div style=${{fontWeight:600,marginBottom:4}}>${result.url}</div><div style=${{fontSize:13,color:"var(--red-text)"}}>${result.error}</div></div></div></div>`;
   const cm={};for(const c of(result.checks||[]))cm[c.id]=c;
   return html`<div class="fade-in">
@@ -343,12 +341,19 @@ function DetailPanel({result}){
   </div>`;
 }
 
+function getFailedBlocks(result){
+  if(!result||!result.checks)return [];
+  const sc=result.checks.find(c=>c.id==="schema");
+  return sc?.extra_data?.failed_blocks||[];
+}
+
 function SingleLayout(){
   const[url,sU]=useState("https://www.samsung.com/sec/smartphones/galaxy-z-fold7/");
   const[loading,sL]=useState(false);
   const[result,sR]=useState(null);
   const[error,sE]=useState(null);
   const submit=useCallback(async e=>{e.preventDefault();if(!url.trim())return;sL(true);sE(null);sR(null);try{sR(await auditOne(url.trim()));}catch(err){sE(err.message||String(err));}finally{sL(false);};},[url]);
+  const failed=getFailedBlocks(result);
   return html`<div class="app-body">
     <div class="left-panel">
       <div style=${{padding:"14px 12px 12px"}}>
@@ -364,6 +369,7 @@ function SingleLayout(){
         </form>
         ${error&&html`<div style=${{marginTop:8,padding:"10px 12px",background:"var(--red-bg)",borderRadius:9,fontSize:12,color:"var(--red-text)"}}>${error}</div>`}
       </div>
+      <${ParseFailurePanel} blocks=${failed}/>
       <${OverallBanner} result=${result}/>
       <${ItemList} result=${result}/>
       <${CriteriaLegend}/>
