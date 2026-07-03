@@ -246,9 +246,27 @@ function OGSection({c}){
   </div>`;
 }
 
+function FailedBlock({block,index}){
+  const[open,sO]=useState(false);
+  return html`<div style=${{background:"var(--red-bg)",borderRadius:9,marginBottom:6,overflow:"hidden"}}>
+    <button style=${{width:"100%",display:"flex",alignItems:"center",justifyContent:"space-between",padding:"9px 12px",background:"none",border:"none",cursor:"pointer",fontFamily:"inherit"}} onClick=${()=>sO(!open)}>
+      <div style=${{display:"flex",alignItems:"center",gap:8}}>
+        <span style=${{width:6,height:6,borderRadius:"50%",background:"var(--red)",flexShrink:0}}></span>
+        <span style=${{fontSize:12,fontWeight:600,color:"var(--red-text)"}}>파싱 실패 블록 ${index+1}</span>
+        <span style=${{fontSize:11,color:"var(--red-text)",opacity:0.7}}>${block.error}</span>
+      </div>
+      <${Icon} name=${open?"chevron_up":"chevron_down"} size=${14}/>
+    </button>
+    ${open&&html`<div style=${{padding:"0 12px 12px"}}>
+      <pre style=${{fontSize:11,lineHeight:1.6,color:"var(--text-primary)",background:"rgba(255,255,255,0.7)",borderRadius:7,padding:"10px 12px",overflowX:"auto",whiteSpace:"pre-wrap",wordBreak:"break-all",maxHeight:300,overflowY:"auto",margin:0,fontFamily:"monospace"}}>${block.raw}</pre>
+    </div>`}
+  </div>`;
+}
+
 function SchemaSection({c}){
   if(!c)return null;
   const ents=c.extra_data?.entities||[];
+  const failed=c.extra_data?.failed_blocks||[];
   const refs=c.schema_extra||[];
   return html`<div class="card fade-in" style=${{marginBottom:12}}>
     <${SecHeader} name="구조화 데이터 (Schema.org)" status=${c.status}/>
@@ -266,6 +284,14 @@ function SchemaSection({c}){
           </div>
         </div>`)}
       </div>
+
+      ${failed.length>0&&html`<div style=${{borderTop:"0.5px solid var(--separator)",paddingTop:14}}>
+        <div style=${{fontSize:11,fontWeight:700,color:"var(--red-text)",marginBottom:8,display:"flex",alignItems:"center",gap:6}}>
+          <${Icon} name="x_circle" size=${13}/>파싱 실패 블록 (${failed.length}개) — 클릭하면 원본 코드 확인
+        </div>
+        ${failed.map((b,i)=>html`<${FailedBlock} key=${i} block=${b} index=${i}/>`)}
+      </div>`}
+
       <div style=${{borderTop:"0.5px solid var(--separator)",paddingTop:14}}>
         <div style=${{fontSize:11,fontWeight:700,color:"var(--text-tertiary)",marginBottom:8}}>@id 교차참조 검증</div>
         ${refs.map((item,i)=>html`<div key=${i} style=${{display:"flex",alignItems:"flex-start",gap:8,padding:"5px 0",borderTop:i>0?"0.5px solid var(--separator)":"none"}}>
@@ -390,35 +416,4 @@ function BulkLayout(){
       </div>
       <div style=${{display:"flex",flexWrap:"wrap",alignItems:"center",gap:10}}>
         <label style=${{fontSize:13,color:"var(--text-secondary)",display:"flex",alignItems:"center",gap:6}}>동시 처리<input type="number" min="1" max="8" value=${conc} onInput=${e=>sConc(Number(e.target.value)||1)} style=${{width:50,border:"1px solid var(--bg-2)",borderRadius:7,padding:"3px 8px",fontFamily:"inherit",fontSize:13}}/></label>
-        ${!running?html`<button onClick=${start} disabled=${!urls.length} class="btn-primary"><${Icon} name="zap" size=${14}/>일괄 검수 (${urls.length}건)</button>`:html`<button onClick=${stop} class="btn-danger"><${Icon} name="stop" size=${14}/>중지</button>`}
-        ${order.length>0&&html`<button class="btn-ghost" onClick=${()=>downloadCSV(order.map(u=>results[u]).filter(Boolean),"seo_audit.csv")}><${Icon} name="download" size=${13}/>CSV</button>`}
-      </div>
-      ${order.length>0&&html`<div>
-        <div class="progress-track"><div class="progress-fill" style=${{width:`${(done/order.length)*100}%`}}></div></div>
-        <div style=${{marginTop:6,fontSize:12,color:"var(--text-secondary)",display:"flex",gap:12}}>
-          <span>${done} / ${order.length} 완료</span>
-          <span style=${{color:"var(--green-text)"}}>정상 ${sum.pass||0}</span>
-          <span style=${{color:"var(--amber-text)"}}>경고 ${sum.warn||0}</span>
-          <span style=${{color:"var(--red-text)"}}>실패 ${sum.fail||0}</span>
-        </div>
-      </div>`}
-    </div>
-    ${order.length>0&&html`<div class="card" style=${{overflow:"hidden"}}>
-      <div style=${{display:"grid",gridTemplateColumns:"minmax(60px,90px) 1fr auto auto auto auto",gap:8,padding:"9px 16px",borderBottom:"0.5px solid var(--separator)"}}>
-        ${["국가","URL","HTTP","판정","미흡",""].map((h,i)=>html`<span key=${i} style=${{fontSize:11,fontWeight:700,color:"var(--text-tertiary)",letterSpacing:"0.05em"}}>${h}</span>`)}
-      </div>
-      ${order.map(u=>html`<${BulkRow} key=${u} url=${u} result=${results[u]} isExp=${exp===u} onToggle=${v=>sExp(e=>e===v?null:v)}/>`)}
-    </div>`}
-  </div>`;
-}
-
-function App(){
-  const[tab,sTab]=useState("single");
-  return html`<div class="app-shell">
-    <${Header} tab=${tab} setTab=${sTab}/>
-    <${ProxyBanner}/>
-    ${tab==="single"?html`<${SingleLayout}/>`:html`<${BulkLayout}/>`}
-  </div>`;
-}
-
-createRoot(document.getElementById("root")).render(html`<${App}/>`);
+        ${!running?html`<button onClick=${start} disabled=${!urls.length} class="btn-primary"><${Icon} name="zap" size=${14}/>일괄 검수 (${urls.length}건)</button>`:html`<button onClick=${stop} class="btn-danger"><${Icon} name="stop" size=$
