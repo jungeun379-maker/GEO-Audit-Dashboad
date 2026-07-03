@@ -416,4 +416,35 @@ function BulkLayout(){
       </div>
       <div style=${{display:"flex",flexWrap:"wrap",alignItems:"center",gap:10}}>
         <label style=${{fontSize:13,color:"var(--text-secondary)",display:"flex",alignItems:"center",gap:6}}>동시 처리<input type="number" min="1" max="8" value=${conc} onInput=${e=>sConc(Number(e.target.value)||1)} style=${{width:50,border:"1px solid var(--bg-2)",borderRadius:7,padding:"3px 8px",fontFamily:"inherit",fontSize:13}}/></label>
-        ${!running?html`<button onClick=${start} disabled=${!urls.length} class="btn-primary"><${Icon} name="zap" size=${14}/>일괄 검수 (${urls.length}건)</button>`:html`<button onClick=${stop} class="btn-danger"><${Icon} name="stop" size=$
+        ${!running?html`<button onClick=${start} disabled=${!urls.length} class="btn-primary"><${Icon} name="zap" size=${14}/>일괄 검수 (${urls.length}건)</button>`:html`<button onClick=${stop} class="btn-danger"><${Icon} name="stop" size=${14}/>중지</button>`}
+        ${order.length>0&&html`<button class="btn-ghost" onClick=${()=>downloadCSV(order.map(u=>results[u]).filter(Boolean),"seo_audit.csv")}><${Icon} name="download" size=${13}/>CSV</button>`}
+      </div>
+      ${order.length>0&&html`<div>
+        <div class="progress-track"><div class="progress-fill" style=${{width:`${(done/order.length)*100}%`}}></div></div>
+        <div style=${{marginTop:6,fontSize:12,color:"var(--text-secondary)",display:"flex",gap:12}}>
+          <span>${done} / ${order.length} 완료</span>
+          <span style=${{color:"var(--green-text)"}}>정상 ${sum.pass||0}</span>
+          <span style=${{color:"var(--amber-text)"}}>경고 ${sum.warn||0}</span>
+          <span style=${{color:"var(--red-text)"}}>실패 ${sum.fail||0}</span>
+        </div>
+      </div>`}
+    </div>
+    ${order.length>0&&html`<div class="card" style=${{overflow:"hidden"}}>
+      <div style=${{display:"grid",gridTemplateColumns:"minmax(60px,90px) 1fr auto auto auto auto",gap:8,padding:"9px 16px",borderBottom:"0.5px solid var(--separator)"}}>
+        ${["국가","URL","HTTP","판정","미흡",""].map((h,i)=>html`<span key=${i} style=${{fontSize:11,fontWeight:700,color:"var(--text-tertiary)",letterSpacing:"0.05em"}}>${h}</span>`)}
+      </div>
+      ${order.map(u=>html`<${BulkRow} key=${u} url=${u} result=${results[u]} isExp=${exp===u} onToggle=${v=>sExp(e=>e===v?null:v)}/>`)}
+    </div>`}
+  </div>`;
+}
+
+function App(){
+  const[tab,sTab]=useState("single");
+  return html`<div class="app-shell">
+    <${Header} tab=${tab} setTab=${sTab}/>
+    <${ProxyBanner}/>
+    ${tab==="single"?html`<${SingleLayout}/>`:html`<${BulkLayout}/>`}
+  </div>`;
+}
+
+createRoot(document.getElementById("root")).render(html`<${App}/>`);
