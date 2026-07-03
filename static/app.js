@@ -380,6 +380,7 @@ function SingleLayout(){
 
 function BulkRow({url,result,isExp,onToggle}){
   const r=result;
+  const failed=r?(r.checks?.find(c=>c.id==="schema")?.extra_data?.failed_blocks||[]):[];
   return html`<div style=${{borderBottom:"0.5px solid var(--separator)"}}>
     <div style=${{display:"grid",gridTemplateColumns:"minmax(60px,90px) 1fr auto auto auto auto",gap:8,alignItems:"center",padding:"11px 16px"}}>
       <span style=${{fontSize:12,fontWeight:600,color:"var(--text-secondary)",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>${extractLabel(url)}</span>
@@ -389,7 +390,10 @@ function BulkRow({url,result,isExp,onToggle}){
       <span style=${{fontSize:12,color:"var(--text-secondary)"}}>${r?r.issue_count??"-":"-"}</span>
       <button style=${{background:"none",border:"none",cursor:"pointer",color:"var(--navy)",fontSize:12,fontWeight:600,padding:"3px 7px",borderRadius:7,display:r?"block":"none"}} onClick=${()=>r&&onToggle(url)}>${isExp?"닫기":"상세"}</button>
     </div>
-    ${isExp&&r?html`<div style=${{padding:"0 12px 14px",background:"var(--bg)"}}><${DetailPanel} result=${r}/></div>`:null}
+    ${isExp&&r?html`<div style=${{padding:"0 12px 14px",background:"var(--bg)"}}>
+      <${ParseFailurePanel} blocks=${failed}/>
+      <${DetailPanel} result=${r}/>
+    </div>`:null}
   </div>`;
 }
 
@@ -449,7 +453,8 @@ function App(){
   return html`<div class="app-shell">
     <${Header} tab=${tab} setTab=${sTab}/>
     <${ProxyBanner}/>
-    ${tab==="single"?html`<${SingleLayout}/>`:html`<${BulkLayout}/>`}
+    <div style=${{display:tab==="single"?"contents":"none"}}><${SingleLayout}/></div>
+    <div style=${{display:tab==="bulk"?"contents":"none"}}><${BulkLayout}/></div>
   </div>`;
 }
 
