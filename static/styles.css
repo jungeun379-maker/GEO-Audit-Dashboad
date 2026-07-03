@@ -1,1 +1,34 @@
-C:\Users\jungeun.hyun\Desktop\seo-audit\static\styles.css
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #eef0fb;
+}
+::-webkit-scrollbar-thumb {
+  background: #b6bfea;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8f9dde;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.fade-in {
+  animation: fadeIn 0.25s ease-out;
+}
+
+.spinner {
+  border: 2px solid #dde1f6;
+  border-top-color: #1428A0;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
