@@ -379,4 +379,9 @@ def audit_url(url: str) -> dict:
 
     except requests.Timeout:
         result["error"] = "요청 시간 초과 (timeout)"
-    except re
+    except requests.RequestException as e:
+        result["error"] = f"요청 오류: {str(e)[:150]}"
+    except Exception as e:
+        result["error"] = f"알 수 없는 오류: {str(e)[:150]}"
+
+    return result
