@@ -1,7 +1,5 @@
 """
 SEO/AEO 검수 핵심 로직.
-samsung_seo_audit_auto.py 의 audit_url() 검수 항목/기준을 그대로 이식하되,
-결과를 대시보드에서 렌더링하기 좋은 구조화된 JSON(checks 배열 + criteria 비고)으로 반환한다.
 """
 import json
 from urllib.parse import urlparse
@@ -20,6 +18,16 @@ HEADERS = {
     "Accept-Language": "en-US,en;q=0.5",
 }
 
+# Schema.org에서 @id 참조로 연결되는 주요 프로퍼티 목록
+ID_REF_PROPS = [
+    "publisher", "author", "creator", "copyrightHolder",
+    "mainEntity", "mainEntityOfPage", "isPartOf", "hasPart",
+    "breadcrumb", "potentialAction", "target", "about",
+    "subjectOf", "provider", "offeredBy", "brand",
+    "itemListElement",  # BreadcrumbList 항목
+    "parentOrganization", "memberOf",
+]
+
 
 def _check(check_id, label, status, value, detail, criteria):
     return {
@@ -29,6 +37,185 @@ def _check(check_id, label, status, value, detail, criteria):
         "value": value,
         "detail": detail,
         "criteria": criteria,
+    }
+
+
+def _collect_ids(data: object, result: set):
+    """JSON-LD 객체에서 선언된 모든 @id 값을 재귀적으로 수집."""
+    if isinstance(data, dict):
+        v = data.get("@id")
+        if v and isinstance(v, str):
+            result.add(v)
+        for val in data.values():
+            _collect_ids(val, result)
+    elif isinstance(data, list):
+        for item in data:
+            _collect_ids(item, result)
+
+
+def _find_broken_refs(data: object, declared_ids: set, path: str, broken: list):
+    """@id 참조 프로퍼티가 선언된 @id를 가리키는지 검증."""
+    if isinstance(data, dict):
+        obj_type = data.get("@type", "")
+        if isinstance(obj_type, list):
+            obj_type = "/".join(obj_type)
+        obj_id = data.get("@id", "")
+        label = f"{obj_type or 'Object'}({obj_id[:40] if obj_id else '?'})"
+
+        for prop in ID_REF_PROPS:
+            val = data.get(prop)
+            if val is None:
+                continue
+            # 단일 참조 객체: {"@id": "..."}
+            if isinstance(val, dict) and list(val.keys()) == ["@id"]:
+                ref = val["@id"]
+                if ref and ref not in declared_ids:
+                    broken.append(f"{label} → .{prop} 참조 @id 미선언: {ref[:60]}")
+            # 배열 내 참조 객체
+            elif isinstance(val, list):
+                for i, item in enumerate(val):
+                    if isinstance(item, dict) and list(item.keys()) == ["@id"]:
+                        ref = item["@id"]
+                        if ref and ref not in declared_ids:
+                            broken.append(f"{label} → .{prop}[{i}] 참조 @id 미선언: {ref[:60]}")
+
+        for val in data.values():
+            if isinstance(val, (dict, list)):
+                _find_broken_refs(val, declared_ids, path, broken)
+    elif isinstance(data, list):
+        for item in data:
+            _find_broken_refs(item, declared_ids, path, broken)
+
+
+def _audit_schema(schema_tags, canonical_href: str) -> dict:
+    """
+    Schema.org JSON-LD 검수:
+    - 선언 존재 여부
+    - @type 목록
+    - @id 보유 여부 (주요 엔티티)
+    - 페이지 간 @id 교차참조 정합성
+    - WebPage @id ↔ canonical 일치 여부
+    Returns dict with keys: status, value, detail, extra (list of sub-findings)
+    """
+    if not schema_tags:
+        return {
+            "status": "warn",
+            "value": "(없음)",
+            "detail": "JSON-LD 없음",
+            "extra": [],
+        }
+
+    # 1. 모든 블록 파싱
+    parsed_blocks = []
+    parse_errors = 0
+    for tag in schema_tags:
+        try:
+            data = json.loads(tag.string or "")
+            parsed_blocks.append(data)
+        except Exception:
+            parse_errors += 1
+
+    # 2. 선언된 @id 전체 수집
+    all_declared_ids: set = set()
+    for block in parsed_blocks:
+        _collect_ids(block, all_declared_ids)
+
+    # 3. @type 목록
+    schema_types = []
+    for block in parsed_blocks:
+        if isinstance(block, dict):
+            items = block.get("@graph", [block])
+            for item in items:
+                t = item.get("@type", "") if isinstance(item, dict) else ""
+                if t:
+                    schema_types.append(t if isinstance(t, str) else "/".join(t))
+
+    # 4. @id 없는 주요 엔티티 탐지
+    TOP_LEVEL_TYPES = {"WebPage", "WebSite", "Organization", "Product", "Article",
+                       "NewsArticle", "BreadcrumbList", "FAQPage", "ItemPage", "LocalBusiness"}
+    missing_ids = []
+    for block in parsed_blocks:
+        items = block.get("@graph", [block]) if isinstance(block, dict) else [block]
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            t = item.get("@type", "")
+            if isinstance(t, list):
+                t = t[0] if t else ""
+            if t in TOP_LEVEL_TYPES and not item.get("@id"):
+                missing_ids.append(t)
+
+    # 5. 교차참조(@id 링크) 정합성 검사
+    broken_refs = []
+    for block in parsed_blocks:
+        _find_broken_refs(block, all_declared_ids, "", broken_refs)
+
+    # 6. WebPage @id ↔ canonical 비교
+    webpage_id_mismatch = False
+    webpage_id_val = None
+    if canonical_href:
+        for block in parsed_blocks:
+            items = block.get("@graph", [block]) if isinstance(block, dict) else [block]
+            for item in items:
+                if not isinstance(item, dict):
+                    continue
+                t = item.get("@type", "")
+                if isinstance(t, list):
+                    t = t[0] if t else ""
+                if t in ("WebPage", "ItemPage", "Article", "NewsArticle", "Product"):
+                    wid = item.get("@id", "")
+                    if wid:
+                        webpage_id_val = wid
+                        # trailing slash 무시 비교
+                        if wid.rstrip("/") != canonical_href.rstrip("/"):
+                            webpage_id_mismatch = True
+
+    # 7. 종합 판정
+    extra = []
+    issues_count = 0
+
+    if parse_errors:
+        extra.append({"type": "warn", "msg": f"JSON-LD 파싱 실패 블록: {parse_errors}개"})
+        issues_count += 1
+
+    if missing_ids:
+        extra.append({"type": "warn", "msg": f"@id 미선언 주요 타입: {', '.join(set(missing_ids))}"})
+        issues_count += len(missing_ids)
+
+    if broken_refs:
+        for ref in broken_refs[:5]:  # 최대 5개만 표시
+            extra.append({"type": "fail", "msg": f"교차참조 오류: {ref}"})
+        if len(broken_refs) > 5:
+            extra.append({"type": "fail", "msg": f"…외 {len(broken_refs) - 5}건 추가 교차참조 오류"})
+        issues_count += len(broken_refs)
+
+    if webpage_id_mismatch and webpage_id_val:
+        extra.append({
+            "type": "warn",
+            "msg": f"WebPage @id({webpage_id_val[:60]}) ≠ canonical({canonical_href[:60]})"
+        })
+        issues_count += 1
+    elif webpage_id_val and not webpage_id_mismatch:
+        extra.append({"type": "pass", "msg": f"WebPage @id ↔ canonical 일치 확인"})
+
+    if not extra:
+        extra.append({"type": "pass", "msg": f"@id 교차참조 이상 없음 (선언 ID {len(all_declared_ids)}개)"})
+
+    if issues_count == 0:
+        status = "pass"
+    elif broken_refs:
+        status = "fail"
+    else:
+        status = "warn"
+
+    type_str = ", ".join(schema_types[:6]) + ("…" if len(schema_types) > 6 else "") if schema_types else "있음(타입불명)"
+    detail = f"{len(schema_tags)}블록 · ID선언 {len(all_declared_ids)}개"
+
+    return {
+        "status": status,
+        "value": type_str,
+        "detail": detail,
+        "extra": extra,
     }
 
 
@@ -169,29 +356,26 @@ def audit_url(url: str) -> dict:
         if missing_og:
             issues.append(f"OG 태그 누락: {', '.join(missing_og)}")
 
-        # ── Schema.org (JSON-LD) ─────────────────────────────
+        # ── Schema.org (JSON-LD) + @id 교차참조 ─────────────
         schema_tags = soup.find_all("script", type="application/ld+json")
-        schema_types = []
-        for s in schema_tags:
-            try:
-                data = json.loads(s.string or "")
-                t = data.get("@type", "") if isinstance(data, dict) else ""
-                if t:
-                    schema_types.append(t if isinstance(t, str) else str(t))
-            except Exception:
-                pass
+        schema_result = _audit_schema(schema_tags, canonical_href)
+        schema_check = _check(
+            "schema",
+            "구조화 데이터 (Schema.org)",
+            schema_result["status"],
+            schema_result["value"],
+            schema_result["detail"],
+            "권장: JSON-LD 구조화 데이터 + @id 교차참조 정합성",
+        )
+        schema_check["schema_extra"] = schema_result["extra"]
+        checks.append(schema_check)
+
         if not schema_tags:
-            checks.append(_check(
-                "schema", "구조화 데이터 (Schema.org)", "warn", "(없음)", "-",
-                "권장: JSON-LD 구조화 데이터 (검색결과 rich snippet / AEO 대응에 유리)",
-            ))
             issues.append("구조화데이터(Schema.org) 없음")
-        else:
-            checks.append(_check(
-                "schema", "구조화 데이터 (Schema.org)", "pass",
-                ", ".join(schema_types) if schema_types else "있음(타입 불명)", f"{len(schema_tags)}개",
-                "권장: JSON-LD 구조화 데이터 (검색결과 rich snippet / AEO 대응에 유리)",
-            ))
+        elif schema_result["status"] == "fail":
+            issues.append("Schema @id 교차참조 오류")
+        elif schema_result["status"] == "warn":
+            issues.append("Schema @id 경고")
 
         # ── robots / noindex ─────────────────────────────────
         robots_tag = soup.find("meta", attrs={"name": "robots"})
