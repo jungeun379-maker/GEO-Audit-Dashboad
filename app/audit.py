@@ -83,7 +83,7 @@ def _audit_schema(schema_tags, canonical_href):
     if not schema_tags:
         return {
             "status": "warn", "value": "(없음)", "detail": "JSON-LD 없음",
-            "extra": [], "entities": [],
+            "extra": [], "entities": [], "failed_blocks": [],
         }
 
     parsed_blocks = []
@@ -379,4 +379,4 @@ def audit_url(url: str) -> dict:
 
     except requests.Timeout:
         result["error"] = "요청 시간 초과 (timeout)"
-    except requests.RequestExcepti
+    except re
