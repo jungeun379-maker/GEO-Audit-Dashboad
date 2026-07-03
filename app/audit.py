@@ -87,13 +87,14 @@ def _audit_schema(schema_tags, canonical_href):
         }
 
     parsed_blocks = []
-    parse_errors = 0
+    failed_blocks = []
     for tag in schema_tags:
+        raw = (tag.string or "").strip()
         try:
-            data = json.loads(tag.string or "")
+            data = json.loads(raw)
             parsed_blocks.append(data)
-        except Exception:
-            parse_errors += 1
+        except Exception as e:
+            failed_blocks.append({"raw": raw[:2000], "error": str(e)})
 
     all_declared_ids = set()
     for block in parsed_blocks:
@@ -151,8 +152,8 @@ def _audit_schema(schema_tags, canonical_href):
     extra = []
     issues_count = 0
 
-    if parse_errors:
-        extra.append({"type": "warn", "msg": f"JSON-LD 파싱 실패 블록: {parse_errors}개"})
+    if failed_blocks:
+        extra.append({"type": "warn", "msg": f"JSON-LD 파싱 실패 블록: {len(failed_blocks)}개"})
         issues_count += 1
     if missing_ids:
         extra.append({"type": "warn", "msg": f"@id 미선언 주요 타입: {', '.join(set(missing_ids))}"})
@@ -184,6 +185,7 @@ def _audit_schema(schema_tags, canonical_href):
         "detail": f"{len(schema_tags)}블록 · ID선언 {len(all_declared_ids)}개",
         "extra": extra,
         "entities": entities,
+        "failed_blocks": failed_blocks,
     }
 
 
@@ -345,7 +347,7 @@ def audit_url(url: str) -> dict:
             "JSON-LD 구조화 데이터 + @id 교차참조 정합성",
         )
         c["schema_extra"] = sr["extra"]
-        c["extra_data"] = {"entities": sr["entities"]}
+        c["extra_data"] = {"entities": sr["entities"], "failed_blocks": sr["failed_blocks"]}
         if not schema_tags:
             issues.append("구조화데이터(Schema.org) 없음")
         elif sr["status"] == "fail":
@@ -377,9 +379,4 @@ def audit_url(url: str) -> dict:
 
     except requests.Timeout:
         result["error"] = "요청 시간 초과 (timeout)"
-    except requests.RequestException as e:
-        result["error"] = f"요청 오류: {str(e)[:150]}"
-    except Exception as e:
-        result["error"] = f"알 수 없는 오류: {str(e)[:150]}"
-
-    return result
+    except requests.RequestExcepti
