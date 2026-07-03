@@ -79,6 +79,73 @@ def _find_broken_refs(data, declared_ids, broken):
             _find_broken_refs(item, declared_ids, broken)
 
 
+def _classify_parse_error(raw, e):
+    msg = e.msg if hasattr(e, "msg") else str(e)
+    lineno = getattr(e, "lineno", None)
+    colno  = getattr(e, "colno",  None)
+    pos    = getattr(e, "pos",    None)
+
+    lines = raw.split("\n")
+    bad_line  = lines[lineno - 1].strip() if lineno and lineno <= len(lines) else ""
+    prev_line = lines[lineno - 2].strip() if lineno and lineno > 1 else ""
+
+    # 오류 유형 분류
+    if "Invalid control character" in msg or "control character" in msg.lower():
+        error_type = "문자열 내 줄바꿈 (개행 문자)"
+        fix_desc   = "JSON 문자열 안에 실제 줄바꿈이 포함되어 있습니다. \\n으로 이스케이프해야 합니다."
+        fix_before = f'"{bad_line[:60]}…'
+        fix_after  = f'"{bad_line[:60].rstrip()}\\n…'
+    elif "Expecting ',' delimiter" in msg:
+        error_type = "쉼표 누락"
+        fix_desc   = f"프로퍼티 사이 쉼표(,)가 빠져 있습니다."
+        fix_before = prev_line
+        fix_after  = prev_line + ","
+    elif "Expecting property name" in msg:
+        if pos and pos > 0 and raw[pos - 1:pos] == ",":
+            error_type = "불필요한 마지막 쉼표 (Trailing Comma)"
+            fix_desc   = "마지막 프로퍼티 뒤에 쉼표가 있습니다. 제거해야 합니다."
+            fix_before = prev_line
+            fix_after  = prev_line.rstrip().rstrip(",")
+        else:
+            error_type = "프로퍼티명 오류"
+            fix_desc   = "프로퍼티명이 올바르지 않습니다. 큰따옴표(\")로 감싸야 합니다."
+            fix_before = bad_line
+            fix_after  = ""
+    elif "Unterminated string" in msg:
+        error_type = "문자열 닫힘 따옴표 누락"
+        fix_desc   = "문자열이 닫히지 않았습니다. 닫는 따옴표(\")가 빠져 있습니다."
+        fix_before = bad_line
+        fix_after  = bad_line + '"'
+    elif "Expecting value" in msg:
+        error_type = "값 누락 또는 Trailing Comma"
+        fix_desc   = "값이 있어야 할 위치에 값이 없거나, 마지막 항목 뒤에 불필요한 쉼표가 있습니다."
+        fix_before = bad_line
+        fix_after  = ""
+    else:
+        error_type = "JSON 문법 오류"
+        fix_desc   = msg
+        fix_before = bad_line
+        fix_after  = ""
+
+    # 오류 위치 전후 컨텍스트 (최대 5줄)
+    context_lines = []
+    if lineno:
+        start = max(0, lineno - 3)
+        end   = min(len(lines), lineno + 2)
+        for i in range(start, end):
+            marker = "▶ " if i == lineno - 1 else "  "
+            context_lines.append(f"{marker}{i+1}: {lines[i]}")
+
+    return {
+        "error_type": error_type,
+        "fix_desc":   fix_desc,
+        "fix_before": fix_before,
+        "fix_after":  fix_after,
+        "location":   f"{lineno}번째 줄 {colno}번째 문자" if lineno else "",
+        "context":    "\n".join(context_lines),
+    }
+
+
 def _audit_schema(schema_tags, canonical_href):
     if not schema_tags:
         return {
@@ -93,8 +160,16 @@ def _audit_schema(schema_tags, canonical_href):
         try:
             data = json.loads(raw)
             parsed_blocks.append(data)
+        except json.JSONDecodeError as e:
+            info = _classify_parse_error(raw, e)
+            info["raw"] = raw[:3000]
+            failed_blocks.append(info)
         except Exception as e:
-            failed_blocks.append({"raw": raw[:2000], "error": str(e)})
+            failed_blocks.append({
+                "error_type": "알 수 없는 오류", "fix_desc": str(e),
+                "fix_before": "", "fix_after": "", "location": "", "context": "",
+                "raw": raw[:3000],
+            })
 
     all_declared_ids = set()
     for block in parsed_blocks:
