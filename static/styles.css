@@ -212,6 +212,13 @@ body {
 .progress-fill  { height: 100%; background: var(--navy); border-radius: 99px; transition: width 0.4s ease; }
 
 /* ── 반응형 ──────────────────────────────────────────────── */
+@media (max-width: 1024px) {
+  .left-panel { width: 260px; }
+}
+@media (max-width: 860px) {
+  .left-panel { width: 220px; }
+  .right-panel { padding: 10px; }
+}
 @media (max-width: 700px) {
   .left-panel { width: 100%; border-right: none; border-bottom: 0.5px solid var(--separator); }
   .app-body   { flex-direction: column; }
