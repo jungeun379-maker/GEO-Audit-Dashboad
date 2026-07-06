@@ -175,40 +175,35 @@ def _audit_schema(schema_tags, canonical_href):
     for block in parsed_blocks:
         _collect_ids(block, all_declared_ids)
 
-    # @type 목록 + 엔티티 목록 (중첩 포함 재귀 탐색)
+    # @type 목록 + 엔티티 목록
     schema_types = []
     entities = []
     TOP_LEVEL_TYPES = {
         "WebPage", "WebSite", "Organization", "Product", "Article",
         "NewsArticle", "BreadcrumbList", "FAQPage", "ItemPage", "LocalBusiness",
     }
+    # Article/NewsArticle은 inline 선언이 일반적이므로 @id 필수 대상에서 제외
+    ID_REQUIRED_TYPES = TOP_LEVEL_TYPES - {"Article", "NewsArticle"}
     missing_ids = []
-    _seen_entities = set()
-
-    def _collect_entities(data):
-        if isinstance(data, dict):
-            t = data.get("@type", "")
-            t_list = t if isinstance(t, list) else ([t] if t else [])
-            t_str = "/".join(t_list) if t_list else ""
-            eid = data.get("@id", "")
-            if t_str:
-                key = (t_str, eid)
-                if key not in _seen_entities:
-                    _seen_entities.add(key)
-                    schema_types.append(t_str)
-                    entities.append({"type": t_str, "id": eid})
-                    for typ in t_list:
-                        if typ in TOP_LEVEL_TYPES and not eid:
-                            missing_ids.append(typ)
-                            break
-            for val in data.values():
-                _collect_entities(val)
-        elif isinstance(data, list):
-            for item in data:
-                _collect_entities(item)
 
     for block in parsed_blocks:
-        _collect_entities(block)
+        if not isinstance(block, dict):
+            continue
+        items = block.get("@graph", [block])
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            t = item.get("@type", "")
+            t_list = t if isinstance(t, list) else ([t] if t else [])
+            t_str = "/".join(t_list)
+            eid = item.get("@id", "")
+            if t_str:
+                schema_types.append(t_str)
+                entities.append({"type": t_str, "id": eid})
+            for typ in t_list:
+                if typ in ID_REQUIRED_TYPES and not eid:
+                    missing_ids.append(typ)
+                    break
 
     broken_refs = []
     for block in parsed_blocks:
