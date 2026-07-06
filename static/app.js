@@ -12,7 +12,27 @@ function Icon({name,size=16}){
 function extractLabel(url){try{const u=new URL(url);const s=u.pathname.split("/").filter(Boolean)[0];return s||u.hostname;}catch{return url;}}
 async function auditOne(url){const r=await fetch("/api/audit",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({url})});if(!r.ok)throw new Error(`서버 오류 (HTTP ${r.status})`);return r.json();}
 async function runPool(items,worker,conc,onEach){let idx=0;async function run(){while(idx<items.length){const i=idx++;try{onEach(items[i],await worker(items[i]),null);}catch(e){onEach(items[i],null,e.message||String(e));}}}await Promise.all(Array.from({length:Math.min(conc,items.length)},run));}
-function toCSV(rows){const h=["국가/구분","URL","HTTP상태","종합판정","미흡항목수","미흡항목","수집경로"];const lines=[h.join(",")];for(const r of rows){const cells=[extractLabel(r.url),r.url,r.http_status??"",r.overall_status??"",r.issue_count??"",(r.issues||[]).join(" | "),r.fetched_via??""].map(c=>`"${String(c).replace(/"/g,'""')}"`);lines.push(cells.join(","));}return lines.join("\n");}
+function toCSV(rows){
+  const h=["국가코드","URL","메타 타이틀","메타 디스크립션","H1 태그","H2 태그 수","선언된 스키마","파싱 오류 여부","파싱 오류 수"];
+  const lines=[h.join(",")];
+  for(const r of rows){
+    const cc=extractLabel(r.url);
+    const url=r.url??"";
+    const chk=(id)=>r.checks?.find(c=>c.id===id);
+    const metaTitle=chk("meta_title")?.value??"";
+    const metaDesc=chk("meta_desc")?.value??"";
+    const h1=chk("h1")?.value??"";
+    const h2Count=chk("h2")?.value??"";
+    const schemaEd=chk("schema")?.extra_data?.entities;
+    const schemaList=Array.isArray(schemaEd)?schemaEd.map(e=>e.type).join(" / "):"";
+    const failedBlocks=chk("schema")?.extra_data?.failed_blocks||[];
+    const parseErr=failedBlocks.length>0?"있음":"없음";
+    const parseErrCount=failedBlocks.length;
+    const cells=[cc,url,metaTitle,metaDesc,h1,h2Count,schemaList,parseErr,parseErrCount].map(c=>`"${String(c).replace(/"/g,'""')}"`);
+    lines.push(cells.join(","));
+  }
+  return lines.join("\n");
+}
 function downloadCSV(rows,fn){const csv="﻿"+toCSV(rows);const b=new Blob([csv],{type:"text/csv;charset=utf-8;"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download=fn;a.click();URL.revokeObjectURL(a.href);}
 function worstStatus(cs){const v=cs.filter(Boolean);if(v.some(c=>c.status==="fail"))return "fail";if(v.some(c=>c.status==="warn"))return "warn";if(!v.length)return null;return "pass";}
 
