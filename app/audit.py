@@ -175,7 +175,7 @@ def _audit_schema(schema_tags, canonical_href):
     for block in parsed_blocks:
         _collect_ids(block, all_declared_ids)
 
-    # @type 목록 + 엔티티 목록
+    # @type 목록 + 엔티티 목록 (중첩 포함 재귀 탐색)
     schema_types = []
     entities = []
     TOP_LEVEL_TYPES = {
@@ -183,23 +183,32 @@ def _audit_schema(schema_tags, canonical_href):
         "NewsArticle", "BreadcrumbList", "FAQPage", "ItemPage", "LocalBusiness",
     }
     missing_ids = []
+    _seen_entities = set()
+
+    def _collect_entities(data):
+        if isinstance(data, dict):
+            t = data.get("@type", "")
+            t_list = t if isinstance(t, list) else ([t] if t else [])
+            t_str = "/".join(t_list) if t_list else ""
+            eid = data.get("@id", "")
+            if t_str:
+                key = (t_str, eid)
+                if key not in _seen_entities:
+                    _seen_entities.add(key)
+                    schema_types.append(t_str)
+                    entities.append({"type": t_str, "id": eid})
+                    for typ in t_list:
+                        if typ in TOP_LEVEL_TYPES and not eid:
+                            missing_ids.append(typ)
+                            break
+            for val in data.values():
+                _collect_entities(val)
+        elif isinstance(data, list):
+            for item in data:
+                _collect_entities(item)
 
     for block in parsed_blocks:
-        if not isinstance(block, dict):
-            continue
-        items = block.get("@graph", [block])
-        for item in items:
-            if not isinstance(item, dict):
-                continue
-            t = item.get("@type", "")
-            if isinstance(t, list):
-                t = "/".join(t)
-            eid = item.get("@id", "")
-            if t:
-                schema_types.append(t)
-                entities.append({"type": t, "id": eid})
-            if t in TOP_LEVEL_TYPES and not eid:
-                missing_ids.append(t)
+        _collect_entities(block)
 
     broken_refs = []
     for block in parsed_blocks:
