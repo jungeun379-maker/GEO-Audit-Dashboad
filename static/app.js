@@ -348,7 +348,7 @@ function getFailedBlocks(result){
 }
 
 function SingleLayout(){
-  const[url,sU]=useState("https://www.samsung.com/sec/smartphones/galaxy-z-fold7/");
+  const[url,sU]=useState("https://www.samsung.com/sg/smartphones/galaxy-s26-ultra/");
   const[loading,sL]=useState(false);
   const[result,sR]=useState(null);
   const[error,sE]=useState(null);
