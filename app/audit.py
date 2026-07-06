@@ -357,23 +357,62 @@ def audit_url(url: str) -> dict:
         checks.append(c)
 
         # ── hreflang ─────────────────────────────────────────
-        hreflang_tags = soup.find_all("link", rel="alternate")
-        hreflang_count = len(hreflang_tags)
-        path_segments = [s for s in urlparse(url).path.split("/") if s]
+        # 방식 1: HTML head <link rel="alternate" hreflang>
+        hreflang_tags = [t for t in soup.find_all("link", rel="alternate") if t.get("hreflang")]
+        parsed_url = urlparse(url)
+        path_segments = [s for s in parsed_url.path.split("/") if s]
         country_hint = path_segments[0] if path_segments else ""
-        self_ref = bool(country_hint) and any(
-            country_hint in (t.get("href") or "") for t in hreflang_tags
-        )
-        if hreflang_count == 0:
-            c = _check("hreflang", "hreflang", "warn", "(없음)", "0개",
-                       "다국가 페이지의 경우 hreflang 및 자기참조 필요")
-            issues.append("hreflang 없음")
-        else:
-            c = _check("hreflang", "hreflang", "pass" if self_ref else "warn",
-                       f"{hreflang_count}개", f"자기참조: {'O' if self_ref else '확인불가/X'}",
-                       "다국가 페이지의 경우 hreflang 및 자기참조 필요")
+
+        if hreflang_tags:
+            hreflang_count = len(hreflang_tags)
+            self_ref = bool(country_hint) and any(
+                country_hint in (t.get("href") or "") for t in hreflang_tags
+            )
+            c = _check("hreflang", "hreflang",
+                       "pass" if self_ref else "warn",
+                       f"HTML head ({hreflang_count}개)",
+                       f"자기참조: {'O' if self_ref else '확인불가/X'}",
+                       "hreflang 선언 방식: HTML head / HTTP 헤더 / Sitemap 중 택일")
             if not self_ref:
-                issues.append("자기참조 hreflang 미확인")
+                issues.append("hreflang 자기참조 미확인")
+        else:
+            # 방식 2: HTTP 응답 헤더 Link:
+            link_header = resp.headers.get("Link", "")
+            header_has_hreflang = "hreflang" in link_header.lower()
+
+            if header_has_hreflang:
+                c = _check("hreflang", "hreflang", "pass",
+                           "HTTP 헤더",
+                           "HTTP Link 헤더에서 hreflang 확인",
+                           "hreflang 선언 방식: HTML head / HTTP 헤더 / Sitemap 중 택일")
+            else:
+                # 방식 3: Sitemap XML (/{cc}/top_sitemap.xml)
+                sitemap_has_hreflang = False
+                sitemap_url = None
+                if country_hint:
+                    sitemap_url = f"{parsed_url.scheme}://{parsed_url.netloc}/{country_hint}/top_sitemap.xml"
+                try:
+                    if sitemap_url:
+                        sm_resp = requests.get(sitemap_url, headers=HEADERS, timeout=10)
+                        if sm_resp.status_code == 200:
+                            sitemap_has_hreflang = (
+                                "hreflang" in sm_resp.text and
+                                parsed_url.path.rstrip("/") in sm_resp.text
+                            )
+                except Exception:
+                    pass
+
+                if sitemap_has_hreflang:
+                    c = _check("hreflang", "hreflang", "pass",
+                               "Sitemap",
+                               f"Sitemap({sitemap_url})에서 hreflang 확인",
+                               "hreflang 선언 방식: HTML head / HTTP 헤더 / Sitemap 중 택일")
+                else:
+                    c = _check("hreflang", "hreflang", "warn",
+                               "(미확인)",
+                               "HTML head / HTTP 헤더 / Sitemap 모두에서 hreflang 미발견",
+                               "hreflang 선언 방식: HTML head / HTTP 헤더 / Sitemap 중 택일")
+                    issues.append("hreflang 미확인 (3가지 방식 모두 미발견)")
         checks.append(c)
 
         # ── canonical ────────────────────────────────────────
