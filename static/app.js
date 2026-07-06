@@ -80,8 +80,8 @@ function IntroPanel(){
 function ParseFailurePanel({blocks}){
   if(!blocks||!blocks.length)return null;
   const[openIdx,sOpen]=useState(null);
-  return html`<div style=${{margin:"0 12px 8px",borderRadius:12,overflow:"hidden",border:"1.5px solid var(--red)",background:"var(--red-bg)"}}>
-    <div style=${{padding:"10px 13px 8px",borderBottom:"1px solid rgba(255,59,48,0.15)"}}>
+  return html`<div style=${{margin:"0 12px 8px",borderRadius:12,border:"1.5px solid var(--red)",background:"var(--red-bg)",maxHeight:"45vh",overflowY:"auto",flexShrink:0}}>
+    <div style=${{padding:"10px 13px 8px",borderBottom:"1px solid rgba(255,59,48,0.15)",position:"sticky",top:0,background:"var(--red-bg)",zIndex:1}}>
       <div style=${{display:"flex",alignItems:"center",gap:7,marginBottom:3}}>
         <${Icon} name="x_circle" size=${15}/>
         <span style=${{fontSize:12,fontWeight:700,color:"var(--red-text)"}}>JSON-LD 파싱 오류 (${blocks.length}건)</span>
