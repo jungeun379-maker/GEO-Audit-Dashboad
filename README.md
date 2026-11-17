@@ -59,3 +59,18 @@ uvicorn app.main:app --reload --port 8000
 | robots/noindex | 의도치 않은 noindex 여부 확인 |
 
 종합 판정: 미흡 0개 = 정상 / 1~2개 = 경고 / 3개 이상 또는 접근 불가 = 실패
+
+## 송년회 RSVP 페이지 (`/year-end-party/`)
+
+같은 Render 서비스에서 `https://<서비스주소>/year-end-party/` 로 열립니다.
+응답은 Supabase(무료)에 저장됩니다. Render 무료 플랜은 재시작 때 디스크가 지워지기 때문입니다.
+
+1. https://supabase.com 가입 → **New project** 생성 (리전: Northeast Asia (Seoul))
+2. 왼쪽 **SQL Editor** → `docs/rsvp-supabase.sql` 내용 붙여넣기 → **Run**
+3. **Project Settings → API** 에서 두 값 복사
+   - Project URL → `SUPABASE_URL`
+   - `service_role` 키 (secret) → `SUPABASE_SERVICE_KEY` (절대 프론트엔드/깃에 넣지 말 것)
+4. Render 대시보드 → 서비스 → **Environment** 에 위 두 값 추가 → 저장 (자동 재배포)
+5. `https://<서비스주소>/year-end-party/` 접속해 테스트 제출 → Supabase **Table Editor → rsvps** 에서 확인
+
+API: `GET /api/rsvp` (목록), `POST /api/rsvp` (작성/수정 — 같은 브라우저에서만 수정 가능)

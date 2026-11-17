@@ -8,6 +8,7 @@ from pydantic import BaseModel
 
 from .audit import audit_url
 from .countries import COUNTRY_CODES
+from .rsvp import router as rsvp_router
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_DIR = BASE_DIR / "static"
@@ -42,6 +43,9 @@ def get_countries():
 @app.post("/api/audit")
 def run_audit(req: AuditRequest):
     return audit_url(req.url.strip())
+
+
+app.include_router(rsvp_router)
 
 
 # API 라우트 다음에 마운트해야 /api/* 가 정적 파일 핸들러에 가로채이지 않는다
