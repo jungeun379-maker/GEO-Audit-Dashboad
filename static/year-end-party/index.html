@@ -1,0 +1,408 @@
+<title>정으니네 송년회 2026</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=DotGothic16&family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap">
+<style>
+/* Layout: 1999년 개인 홈페이지 — 체크무늬 배경 위에 윈도우98 팝업 창들이 세로로 쌓인 구조 */
+:root{
+  --hot:#ff2bd6;      /* 핫핑크 */
+  --cyan:#00f0ff;     /* 사이버 시안 */
+  --lime:#c6ff00;     /* 형광 라임 */
+  --ink:#140a2e;      /* 남보라 잉크 */
+  --win:#c3c3c3;      /* 윈98 회색 */
+  --paper:#fffdf5;
+  --title1:#000080; --title2:#1084d0;
+  --f-display:"Black Han Sans","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  --f-pixel:"DotGothic16","Courier New",monospace;
+  --f-hand:"Gaegu","Comic Sans MS",cursive;
+  --f-body:"Gowun Dodum","Apple SD Gothic Neo","Malgun Gothic",sans-serif;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;
+  background-color:#ffb8f0;
+  background-image:
+    linear-gradient(45deg,#ff8fe6 25%,transparent 25%,transparent 75%,#ff8fe6 75%),
+    linear-gradient(45deg,#ff8fe6 25%,transparent 25%,transparent 75%,#ff8fe6 75%);
+  background-size:48px 48px;background-position:0 0,24px 24px;
+  overflow-x:hidden;
+}
+.marquee{background:var(--ink);color:var(--lime);font-family:var(--f-pixel);font-size:15px;white-space:nowrap;overflow:hidden;border-bottom:3px solid var(--hot)}
+.marquee span{display:inline-block;padding:6px 0;animation:mq 22s linear infinite;padding-left:100%}
+@keyframes mq{to{transform:translateX(-100%)}}
+.wrap{max-width:760px;margin:0 auto;padding-block:20px 60px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:28px}
+
+/* 윈98 창 */
+.win{background:var(--win);border:2px solid;border-color:#fff #404040 #404040 #fff;box-shadow:1px 1px 0 #000,8px 8px 0 var(--ink);min-width:0}
+.win:nth-of-type(even){transform:rotate(.6deg)}
+.win:nth-of-type(odd){transform:rotate(-.5deg)}
+.titlebar{background:linear-gradient(90deg,var(--title1),var(--title2));color:#fff;font-family:var(--f-pixel);font-size:14px;padding:3px 4px 3px 8px;display:flex;align-items:center;gap:8px}
+.titlebar b{flex:1;font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.tb-btn{width:20px;height:18px;background:var(--win);color:#000;border:2px solid;border-color:#fff #404040 #404040 #fff;font:700 11px/12px var(--f-pixel);display:grid;place-items:center;flex:none}
+.body{padding:18px;background:var(--paper);margin:3px;border:2px solid;border-color:#808080 #fff #fff #808080}
+
+/* 히어로 */
+.hero{text-align:center;position:relative;padding-block:10px 4px}
+.sticker{display:inline-block;font-family:var(--f-pixel);background:var(--lime);border:2px solid var(--ink);padding:2px 10px;transform:rotate(-4deg);font-size:14px}
+.chrome{font-family:var(--f-display);font-size:clamp(44px,13vw,96px);line-height:.95;margin:14px 0 6px;letter-spacing:-.01em;
+  background:linear-gradient(180deg,#fff 0%,#9ad8ff 38%,#1d2a6b 50%,#c9f3ff 62%,#ffffff 100%);-webkit-background-clip:text;background-clip:text;color:transparent;
+  -webkit-text-stroke:2px var(--ink);filter:drop-shadow(5px 5px 0 var(--hot)) drop-shadow(-3px -3px 0 var(--cyan));text-wrap:balance}
+.hero .sub{font-family:var(--f-hand);font-size:24px;font-weight:700;margin:0}
+.hero .sub em{font-style:normal;background:var(--hot);color:#fff;padding:0 6px}
+.blink{animation:bl 1s steps(1) infinite}
+@keyframes bl{50%{opacity:0}}
+.star{position:absolute;font-size:30px;color:var(--hot);animation:spin 4s linear infinite;text-shadow:0 0 6px #fff}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* 정보 */
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}
+.fact{border:3px dashed var(--hot);padding:12px 14px;background:#fff;min-width:0}
+.fact .k{font-family:var(--f-pixel);font-size:13px;color:var(--hot);letter-spacing:.08em}
+.fact .v{font-family:var(--f-display);font-size:26px;line-height:1.2}
+.fact .n{font-family:var(--f-hand);font-size:18px}
+.dday{margin-top:14px;text-align:center;font-family:var(--f-pixel);background:var(--ink);color:var(--lime);padding:10px;font-size:18px;font-variant-numeric:tabular-nums}
+.dday strong{font-family:var(--f-display);font-weight:400;font-size:34px;color:var(--cyan);margin:0 4px}
+
+/* 프로그램 */
+.prog{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.card{background:#fff;border:3px solid var(--ink);padding:14px;position:relative;min-width:0}
+.card:nth-child(1){box-shadow:6px 6px 0 var(--cyan)}
+.card:nth-child(2){box-shadow:6px 6px 0 var(--lime)}
+.card:nth-child(3){box-shadow:6px 6px 0 var(--hot)}
+.card:nth-child(4){box-shadow:6px 6px 0 #ffe600}
+.card .time{font-family:var(--f-pixel);font-size:12px;background:var(--ink);color:#fff;padding:1px 6px;display:inline-block}
+.card h3{font-family:var(--f-display);font-weight:400;font-size:26px;margin:6px 0 4px;line-height:1.2}
+.card p{margin:0}
+.card .aside{font-family:var(--f-hand);font-size:17px;color:#6b2a8f;margin-top:6px}
+.tag{display:inline-block;border:2px solid var(--ink);border-radius:999px;padding:0 8px;margin:4px 4px 0 0;font-size:14px;background:#f4ecff}
+
+/* 폼 */
+form{display:flex;flex-direction:column;gap:18px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field>label,.legend{font-family:var(--f-display);font-size:20px;line-height:1.2}
+.field .hint{font-family:var(--f-hand);font-size:17px;color:#6b2a8f;margin-top:-4px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media (max-width:520px){.row2{grid-template-columns:1fr}}
+input[type=text],textarea,select{font:inherit;font-size:16px;padding:9px 10px;background:#fff;color:var(--ink);border:2px solid;border-color:#404040 #fff #fff #404040;outline:none;width:100%;border-radius:0}
+textarea{min-height:76px;resize:vertical}
+input:focus,textarea:focus,select:focus{box-shadow:0 0 0 3px var(--hot)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative}
+.chip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.chip span{display:inline-block;padding:5px 12px;border:2px solid var(--ink);background:#fff;font-size:15px;cursor:pointer;user-select:none;transition:transform .1s}
+.chip input:checked+span{background:var(--hot);color:#fff;transform:rotate(-3deg) scale(1.05);box-shadow:3px 3px 0 var(--ink)}
+.chip input:focus-visible+span{outline:3px solid var(--cyan);outline-offset:2px}
+.attend{display:flex;flex-wrap:wrap;gap:10px;position:relative;min-height:52px}
+.btn98{font-family:var(--f-pixel);font-size:16px;padding:8px 18px;background:var(--win);color:#000;border:2px solid;border-color:#fff #404040 #404040 #fff;box-shadow:1px 1px 0 #000;cursor:pointer}
+.btn98:active{border-color:#404040 #fff #fff #404040}
+.btn98:focus-visible{outline:2px dotted #000;outline-offset:-6px}
+.btn98[aria-pressed=true]{background:var(--lime);border-color:#404040 #fff #fff #404040;font-weight:700}
+#noBtn{transition:transform .18s ease-out}
+.submit{font-family:var(--f-display);font-size:26px;padding:14px;background:linear-gradient(180deg,var(--hot),#b4009a);color:#fff;border:3px solid var(--ink);box-shadow:6px 6px 0 var(--ink);cursor:pointer;letter-spacing:.02em}
+.submit:hover{filter:hue-rotate(40deg)}
+.submit:active{transform:translate(4px,4px);box-shadow:2px 2px 0 var(--ink)}
+.submit:disabled{opacity:.6;cursor:wait}
+.status{font-family:var(--f-pixel);font-size:14px;padding:8px 10px;border:2px dashed var(--ink);background:#fff8c4}
+.status:empty{display:none}
+.copyrow{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+
+/* 방명록 */
+.board-empty{font-family:var(--f-hand);font-size:20px;text-align:center;padding:14px}
+.guests{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.guest{background:#fff;border:2px solid var(--ink);padding:10px 12px;min-width:0;overflow-wrap:anywhere}
+.guest .nick{font-family:var(--f-display);font-size:22px;line-height:1.2}
+.guest .real{font-size:13px;color:#555}
+.guest .resolve{font-family:var(--f-hand);font-size:18px;margin:6px 0}
+.guest .wed{font-family:var(--f-pixel);font-size:13px;background:var(--cyan);display:inline-block;padding:0 6px}
+.pill{font-family:var(--f-pixel);font-size:12px;padding:0 6px;border:1px solid var(--ink);margin-left:6px;vertical-align:middle}
+.pill.yes{background:var(--lime)}.pill.maybe{background:#ffe600}.pill.no{background:#ddd}
+.tally{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:16px}
+@media (max-width:520px){.tally{grid-template-columns:1fr}}
+.tally h4{font-family:var(--f-display);font-weight:400;font-size:20px;margin:0 0 6px}
+.bar{display:grid;grid-template-columns:80px 1fr 28px;gap:8px;align-items:center;font-size:14px;margin-bottom:4px;font-variant-numeric:tabular-nums}
+.bar i{display:block;height:14px;background:repeating-linear-gradient(90deg,var(--hot) 0 6px,#ff7be6 6px 12px);border:1px solid var(--ink);min-width:2px}
+.counter{font-family:var(--f-pixel);text-align:center;font-size:13px;color:var(--ink)}
+.counter b{background:#000;color:#0f0;padding:1px 6px;letter-spacing:.2em;font-weight:400}
+footer{font-family:var(--f-pixel);font-size:12px;text-align:center}
+
+/* 팝업 */
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);z-index:50;width:min(340px,calc(100% - 32px))}
+.toast .body{text-align:center;font-family:var(--f-hand);font-size:20px}
+@media (prefers-reduced-motion:reduce){.marquee span,.star,.blink{animation:none}.marquee span{padding-left:16px}}
+</style>
+
+<div class="marquee" aria-hidden="true"><span>★☆★ 2026 정으니네 송년회 ★☆★ 본 초대장은 거절 버튼이 정상 작동하지 않을 수 있습니다 ★ 12월 18일 수원으로 집합 ★ 결혼 예상시점 거짓말 금지 ★ 루미큐브 패배자는 설거지 ★☆★</span></div>
+
+<main class="wrap">
+
+  <section class="win" aria-labelledby="h-hero">
+    <div class="titlebar"><b>초대장.exe — 응답 없음(?)</b><span class="tb-btn">_</span><span class="tb-btn">□</span><span class="tb-btn">×</span></div>
+    <div class="body hero">
+      <span class="star" style="top:6px;left:10px">✦</span>
+      <span class="star" style="bottom:10px;right:14px;color:#00b8c4">✧</span>
+      <span class="sticker">2026 ㅅㅇㄴ 공식 행사</span>
+      <h1 class="chrome" id="h-hero">정으니네<br>송년회</h1>
+      <p class="sub">올해도 <em>고생했다</em> 이 킹받는 인간들아<span class="blink">_</span></p>
+    </div>
+  </section>
+
+  <section class="win" aria-labelledby="h-info">
+    <div class="titlebar"><b>내 컴퓨터 &gt; 행사정보 (C:)</b><span class="tb-btn">×</span></div>
+    <div class="body">
+      <h2 id="h-info" hidden>행사 정보</h2>
+      <div class="facts">
+        <div class="fact"><div class="k">WHERE</div><div class="v">수원 정으니네집</div><div class="n">신발 정리 필수. 집주인 기분 = 행사 분위기</div></div>
+        <div class="fact"><div class="k">WHEN</div><div class="v">12.18 금 → 12.19 토</div><div class="n">1박 2일. 첫차 귀가 같은 건 없음</div></div>
+      </div>
+      <div class="dday" id="dday">D-?? 계산 중...</div>
+    </div>
+  </section>
+
+  <section class="win" aria-labelledby="h-prog">
+    <div class="titlebar"><b>프로그램.txt — 메모장</b><span class="tb-btn">×</span></div>
+    <div class="body">
+      <h2 id="h-prog" hidden>주요 프로그램</h2>
+      <div class="prog">
+        <article class="card">
+          <span class="time">PART 1</span>
+          <h3>저녁먹기</h3>
+          <p>배달음식 대잔치. 와인, 소주, 막걸리 등 메뉴랑 주종은 아래 RSVP에서 직접 고르기.</p>
+          <div class="aside">※ 안 고르면 집주인 취향으로 강제 배정</div>
+        </article>
+        <article class="card">
+          <span class="time">PART 2</span>
+          <h3>게임하기</h3>
+          <div><span class="tag">브루마블</span><span class="tag">루미큐브</span><span class="tag">99게임</span></div>
+          <div class="aside">우정 파괴 책임지지 않음</div>
+        </article>
+        <article class="card">
+          <span class="time">PART 3</span>
+          <h3>닌텐도 팀웍 다지기</h3>
+          <p>이서경 님 찬조 닌텐도 스위치로 협동 플레이. 이서경 님께 박수.</p>
+          <div class="aside">협동 게임인데 왜 다들 서로 탓함?</div>
+        </article>
+        <article class="card">
+          <span class="time">PART 4</span>
+          <h3>케이팝 타임</h3>
+          <p>진영, 최산, 강다니엘 등 핫한 영상 시청 + 걸그룹 안무 따라하기 + 레전드 영상 복습.</p>
+          <div class="aside">안무 틀리면 영상 박제됨</div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="win" aria-labelledby="h-rsvp">
+    <div class="titlebar"><b>RSVP_진짜_최종_v3.doc</b><span class="tb-btn">×</span></div>
+    <div class="body">
+      <h2 id="h-rsvp" style="font-family:var(--f-display);font-weight:400;font-size:32px;margin:0 0 12px;line-height:1.1">참석 신고서</h2>
+      <form id="form" novalidate>
+        <div class="field">
+          <span class="legend">오실 거죠?</span>
+          <div class="attend" id="attend">
+            <button type="button" class="btn98" data-v="yes" aria-pressed="true">무조건 감</button>
+            <button type="button" class="btn98" data-v="maybe" aria-pressed="false">고민중 (곧 감)</button>
+            <button type="button" class="btn98" data-v="no" aria-pressed="false" id="noBtn">못 감</button>
+          </div>
+          <div class="hint" id="noHint"></div>
+        </div>
+
+        <div class="row2">
+          <div class="field">
+            <label for="name">이름</label>
+            <input type="text" id="name" maxlength="20" placeholder="예) 김정은" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="nick">별명</label>
+            <input type="text" id="nick" maxlength="20" placeholder="예) 루미큐브의 신">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="resolve">송년회에 임하는 각오</label>
+          <div class="hint">한 줄이면 충분. 지킬 필요는 없음</div>
+          <textarea id="resolve" maxlength="200" placeholder="예) 브루마블에서 서울 사고 파산하겠습니다"></textarea>
+        </div>
+
+        <div class="field">
+          <label for="wedding">결혼 예상시점</label>
+          <div class="hint">솔직하게. 다들 기억할 거임</div>
+          <div class="row2">
+            <select id="wedding">
+              <option value="">골라주세요</option>
+              <option>2027년 (진짜임)</option>
+              <option>2028년</option>
+              <option>2029~2030년</option>
+              <option>2030년대 언젠가</option>
+              <option>이미 함 ㅎ</option>
+              <option>상대부터 구해야 함</option>
+              <option>비혼이 체질</option>
+              <option>그걸 왜 물어봄</option>
+            </select>
+            <input type="text" id="weddingNote" maxlength="40" placeholder="부연설명 (선택)">
+          </div>
+        </div>
+
+        <div class="field">
+          <span class="legend">먹고 싶은 배달음식 (여러 개 가능)</span>
+          <div class="chips" id="menu"></div>
+          <input type="text" id="menuEtc" maxlength="40" placeholder="그 밖에 땡기는 거 직접 입력">
+        </div>
+
+        <div class="field">
+          <span class="legend">주종 선택 (여러 개 가능)</span>
+          <div class="chips" id="drink"></div>
+          <input type="text" id="drinkEtc" maxlength="40" placeholder="그 밖의 주종 / 들고 올 술">
+        </div>
+
+        <button type="submit" class="submit" id="submitBtn">제출하고 빠져나갈 수 없음</button>
+        <div class="status" id="status" role="status"></div>
+        <div class="copyrow" id="copyRow" hidden>
+          <button type="button" class="btn98" id="copyBtn">내 답변 복사하기</button>
+          <span class="hint" style="font-family:var(--f-hand);font-size:17px">복사해서 단톡방에 붙여넣어 주세요</span>
+        </div>
+        <textarea id="copyText" readonly hidden></textarea>
+      </form>
+    </div>
+  </section>
+
+  <section class="win" aria-labelledby="h-board">
+    <div class="titlebar"><b>참석자_방명록.html — Netscape</b><span class="tb-btn">×</span></div>
+    <div class="body">
+      <h2 id="h-board" style="font-family:var(--f-display);font-weight:400;font-size:28px;margin:0 0 12px">지금까지 신고한 사람들</h2>
+      <div id="tally" class="tally" hidden></div>
+      <div id="guests" class="guests"></div>
+      <div id="boardEmpty" class="board-empty">아직 아무도 신고 안 함. 1등 하면 루미큐브 선공권(구라)</div>
+    </div>
+  </section>
+
+  <div class="counter">당신은 <b id="visits">000127</b> 번째 방문자입니다 (아마도)</div>
+  <footer>Best viewed in Internet Explorer 6.0 · 800×600 · 정으니네집 웹마스터</footer>
+</main>
+
+<div class="toast win" id="toast" hidden>
+  <div class="titlebar"><b>알림</b><span class="tb-btn">×</span></div>
+  <div class="body" id="toastMsg"></div>
+</div>
+
+<script>
+const MENUS=["치킨","피자","족발·보쌈","떡볶이","마라탕","회·초밥","곱창·막창","중식","햄버거"];
+const DRINKS=["와인","소주","막걸리","맥주","하이볼","샴페인","무알콜"];
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+function chips(el,items,name){el.innerHTML=items.map((t,i)=>`<label class="chip"><input type="checkbox" id="${name}${i}" value="${esc(t)}"><span>${esc(t)}</span></label>`).join("")}
+chips($("#menu"),MENUS,"m");chips($("#drink"),DRINKS,"d");
+
+/* D-day */
+(function(){
+  const party=new Date(2026,11,18),now=new Date();now.setHours(0,0,0,0);
+  const d=Math.round((party-now)/864e5);
+  $("#dday").innerHTML=d>0?`송년회까지 <strong>D-${d}</strong> 일 남음`:d===0?`<strong>D-DAY</strong> 지금 출발하세요`:d===-1?`<strong>진행중</strong> 아직 안 왔으면 빨리`:`<strong>종료</strong> 내년에 또 봐요`;
+})();
+try{const k="visit-n";const n=(+localStorage.getItem(k)||127)+1;localStorage.setItem(k,n);$("#visits").textContent=String(n).padStart(6,"0")}catch(e){}
+
+/* 참석 버튼 + 도망가는 '못 감' */
+let attend="yes",dodges=0;
+const noBtn=$("#noBtn"),noLines=["어딜 누르시려고","안 돼 돌아와","진짜로...?","끈질기시네요. 이제 눌러도 됨"];
+function setAttend(v){attend=v;document.querySelectorAll("#attend .btn98").forEach(b=>b.setAttribute("aria-pressed",b.dataset.v===v))}
+function dodge(e){
+  if(dodges>=3)return;
+  if(e&&e.type!=="pointerenter")e.preventDefault();
+  dodges++;
+  const x=(Math.random()*2-1)*Math.min(140,window.innerWidth/4),y=(Math.random()*2-1)*30;
+  noBtn.style.transform=`translate(${x}px,${y}px) rotate(${(Math.random()*2-1)*20}deg)`;
+  $("#noHint").textContent=noLines[dodges-1];
+  if(dodges>=3)setTimeout(()=>{noBtn.style.transform="";$("#noHint").textContent=noLines[3]},700);
+}
+noBtn.addEventListener("pointerenter",e=>{if(e.pointerType==="mouse")dodge(e)});
+noBtn.addEventListener("pointerdown",e=>{if(dodges<3)dodge(e)});
+document.querySelectorAll("#attend .btn98").forEach(b=>b.addEventListener("click",e=>{
+  if(b===noBtn&&dodges<3){dodge(e);return}
+  setAttend(b.dataset.v);
+}));
+
+/* 폼 값 */
+const checked=id=>[...document.querySelectorAll(`#${id} input:checked`)].map(i=>i.value);
+function collect(){
+  return{attend,name:$("#name").value.trim(),nick:$("#nick").value.trim(),resolve:$("#resolve").value.trim(),
+    wedding:$("#wedding").value,weddingNote:$("#weddingNote").value.trim(),
+    menus:checked("menu"),menuEtc:$("#menuEtc").value.trim(),drinks:checked("drink"),drinkEtc:$("#drinkEtc").value.trim()};
+}
+function fill(d){
+  setAttend(d.attend||"yes");if(d.attend==="no")dodges=3;
+  for(const k of["name","nick","resolve","wedding","weddingNote","menuEtc","drinkEtc"])if(d[k]!=null)$("#"+k).value=d[k];
+  document.querySelectorAll("#menu input").forEach(i=>i.checked=(d.menus||[]).includes(i.value));
+  document.querySelectorAll("#drink input").forEach(i=>i.checked=(d.drinks||[]).includes(i.value));
+}
+const ATT={yes:"무조건 감",maybe:"고민중",no:"못 감"};
+function asText(d){
+  return `[정으니네 송년회 RSVP]\n참석: ${ATT[d.attend]}\n이름: ${d.name}${d.nick?` (${d.nick})`:""}\n각오: ${d.resolve||"-"}\n결혼 예상: ${d.wedding||"-"}${d.weddingNote?` / ${d.weddingNote}`:""}\n메뉴: ${[...d.menus,d.menuEtc].filter(Boolean).join(", ")||"-"}\n주종: ${[...d.drinks,d.drinkEtc].filter(Boolean).join(", ")||"-"}`;
+}
+function toast(msg){$("#toastMsg").textContent=msg;$("#toast").hidden=false;clearTimeout(toast.t);toast.t=setTimeout(()=>$("#toast").hidden=true,3200)}
+function status(msg){$("#status").textContent=msg}
+function showCopy(d){$("#copyText").value=asText(d);$("#copyRow").hidden=false}
+$("#copyBtn").addEventListener("click",()=>{
+  const t=$("#copyText");
+  navigator.clipboard?.writeText(t.value).then(()=>toast("복사 완료! 단톡방에 붙여넣기 ㄱㄱ"),()=>{t.hidden=false;t.select()})
+  ?? (t.hidden=false,t.select());
+});
+
+/* 방명록 렌더 */
+function render(rows){
+  rows.sort((a,b)=>(a.updatedAt||0)-(b.updatedAt||0));
+  $("#boardEmpty").hidden=rows.length>0;
+  $("#guests").innerHTML=rows.map(r=>`<div class="guest">
+    <div class="nick">${esc(r.nick||r.name)}<span class="pill ${esc(r.attend)}">${esc(ATT[r.attend]||"")}</span></div>
+    ${r.nick?`<div class="real">${esc(r.name)}</div>`:""}
+    <div class="resolve">“${esc(r.resolve||"각오 없음. 그게 각오임")}”</div>
+    <span class="wed">결혼: ${esc(r.wedding||"비공개")}${r.weddingNote?` · ${esc(r.weddingNote)}`:""}</span>
+  </div>`).join("");
+  const going=rows.filter(r=>r.attend!=="no");
+  const tally=(list,key,etc)=>{const c={};going.forEach(r=>{(r[key]||[]).forEach(x=>c[x]=(c[x]||0)+1);if(r[etc])c[r[etc]]=(c[r[etc]]||0)+1});
+    const e=Object.entries(c).sort((a,b)=>b[1]-a[1]).slice(0,6);const max=Math.max(1,...e.map(x=>x[1]));
+    return e.length?e.map(([k,v])=>`<div class="bar"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(k)}</span><i style="width:${v/max*100}%"></i><span>${v}</span></div>`).join(""):`<div class="hint" style="font-family:var(--f-hand)">아직 표 없음</div>`};
+  $("#tally").hidden=rows.length===0;
+  $("#tally").innerHTML=`<div><h4>메뉴 순위</h4>${tally(MENUS,"menus","menuEtc")}</div><div><h4>주종 순위</h4>${tally(DRINKS,"drinks","drinkEtc")}</div>`;
+}
+
+/* 저장소 연결 */
+let db=null,myRef=null,readOnly=false;
+const form=$("#form");
+form.addEventListener("submit",async e=>{
+  e.preventDefault();
+  const d=collect();
+  if(!d.name){status("이름은 써야죠... 누군지 모름");$("#name").focus();return}
+  showCopy(d);
+  if(!myRef||readOnly){status("이 화면에서는 저장이 안 돼요. 아래 버튼으로 답변을 복사해서 단톡방에 보내주세요.");return}
+  const btn=$("#submitBtn");btn.disabled=true;
+  try{
+    await myRef.set({...d,updatedAt:Date.now()});
+    status("");toast(d.attend==="no"?"불참 접수... 서운함 +100":"접수 완료! 12월 18일에 봐요");
+    btn.textContent="수정해서 다시 제출";
+  }catch(err){
+    if(err&&err.code==="invalid_argument"){readOnly=true}
+    status("저장에 실패했어요. 아래 버튼으로 답변을 복사해서 단톡방에 보내주세요.");
+  }finally{btn.disabled=false}
+});
+
+(async()=>{
+  const timer=setTimeout(()=>{if(!db)status("방명록을 불러오지 못했어요. RSVP는 답변 복사로 보내주세요.")},10000);
+  try{
+    const [d,user]=await Promise.all([window.claude?.use?.("db"),window.claude?.use?.("user")]);
+    db=d;
+    if(!db){clearTimeout(timer);status("로그인하면 RSVP가 방명록에 바로 올라가요. 지금은 답변 복사로 보내주세요.");return}
+    const id=user?await user.id():null;
+    if(id){myRef=db.doc("rsvps/"+id);const can=await user.can("data.write");if(can===false)readOnly=true}
+    else readOnly=true;
+    if(readOnly)status("보기 전용 권한이에요. 답변을 복사해서 단톡방에 보내주세요.");
+    db.collection("rsvps").onSnapshot(snap=>{
+      clearTimeout(timer);
+      const rows=snap.docs.filter(s=>s.exists).map(s=>({id:s.id,...s.data()}));
+      render(rows);
+      const mine=id&&rows.find(r=>r.id===id);
+      if(mine&&!form.dataset.filled){form.dataset.filled="1";fill(mine);$("#submitBtn").textContent="수정해서 다시 제출"}
+    },()=>{clearTimeout(timer)});
+  }catch(e){clearTimeout(timer)}
+})();
+</script>
