@@ -366,27 +366,49 @@ function render(rows){
   $("#tally").innerHTML=`<div><h4>메뉴 순위</h4>${tally(MENUS,"menus","menuEtc")}</div><div><h4>주종 순위</h4>${tally(DRINKS,"drinks","drinkEtc")}</div>`;
 }
 
-/* 저장소 연결 */
-let db=null,myRef=null,readOnly=false;
+/* 저장소 연결: claude.ai 안에서는 db 기능, 일반 웹(Render)에서는 /api/rsvp 서버 */
+let db=null,myRef=null,readOnly=false,api=null;
 const form=$("#form");
+const fillMine=(rows,id)=>{const mine=id&&rows.find(r=>r.id===id);
+  if(mine&&!form.dataset.filled){form.dataset.filled="1";fill(mine);$("#submitBtn").textContent="수정해서 다시 제출"}};
 form.addEventListener("submit",async e=>{
   e.preventDefault();
   const d=collect();
   if(!d.name){status("이름은 써야죠... 누군지 모름");$("#name").focus();return}
   showCopy(d);
-  if(!myRef||readOnly){status("이 화면에서는 저장이 안 돼요. 아래 버튼으로 답변을 복사해서 단톡방에 보내주세요.");return}
+  if(!api&&(!myRef||readOnly)){status("이 화면에서는 저장이 안 돼요. 아래 버튼으로 답변을 복사해서 단톡방에 보내주세요.");return}
   const btn=$("#submitBtn");btn.disabled=true;
   try{
-    await myRef.set({...d,updatedAt:Date.now()});
+    if(api)await api.save(d);else await myRef.set({...d,updatedAt:Date.now()});
     status("");toast(d.attend==="no"?"불참 접수... 서운함 +100":"접수 완료! 12월 18일에 봐요");
     btn.textContent="수정해서 다시 제출";
+    if(api)api.refresh();
   }catch(err){
     if(err&&err.code==="invalid_argument"){readOnly=true}
-    status("저장에 실패했어요. 아래 버튼으로 답변을 복사해서 단톡방에 보내주세요.");
+    status(err&&err.message&&api?err.message+" 아래 버튼으로 답변을 복사해서 단톡방에 보내주세요.":"저장에 실패했어요. 아래 버튼으로 답변을 복사해서 단톡방에 보내주세요.");
   }finally{btn.disabled=false}
 });
 
-(async()=>{
+function startApi(){
+  const store=(k,make)=>{try{let v=localStorage.getItem(k);if(!v){v=make();localStorage.setItem(k,v)}return v}catch(e){return make()}};
+  const uuid=()=>crypto.randomUUID?crypto.randomUUID():Date.now().toString(36)+"-"+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2);
+  const id=store("rsvp-id",uuid),key=store("rsvp-key",()=>uuid()+uuid());
+  api={
+    async refresh(){
+      const r=await fetch("/api/rsvp");if(!r.ok)throw new Error("load");
+      const {rows}=await r.json();render(rows);fillMine(rows,id);
+    },
+    async save(data){
+      const r=await fetch("/api/rsvp",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id,key,data})});
+      if(!r.ok){let m="저장에 실패했어요.";try{const j=await r.json();if(typeof j.detail==="string")m=j.detail}catch(e){}throw new Error(m)}
+    }
+  };
+  api.refresh().catch(()=>{api=null;status("방명록을 불러오지 못했어요. RSVP는 답변 복사로 보내주세요.")});
+  setInterval(()=>{if(api&&!document.hidden)api.refresh().catch(()=>{})},20000);
+}
+
+if(!window.claude)startApi();
+else (async()=>{
   const timer=setTimeout(()=>{if(!db)status("방명록을 불러오지 못했어요. RSVP는 답변 복사로 보내주세요.")},10000);
   try{
     const [d,user]=await Promise.all([window.claude?.use?.("db"),window.claude?.use?.("user")]);
@@ -399,9 +421,7 @@ form.addEventListener("submit",async e=>{
     db.collection("rsvps").onSnapshot(snap=>{
       clearTimeout(timer);
       const rows=snap.docs.filter(s=>s.exists).map(s=>({id:s.id,...s.data()}));
-      render(rows);
-      const mine=id&&rows.find(r=>r.id===id);
-      if(mine&&!form.dataset.filled){form.dataset.filled="1";fill(mine);$("#submitBtn").textContent="수정해서 다시 제출"}
+      render(rows);fillMine(rows,id);
     },()=>{clearTimeout(timer)});
   }catch(e){clearTimeout(timer)}
 })();
