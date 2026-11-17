@@ -69,7 +69,7 @@ uvicorn app.main:app --reload --port 8000
 2. 왼쪽 **SQL Editor** → `docs/rsvp-supabase.sql` 내용 붙여넣기 → **Run**
 3. **Project Settings → API** 에서 두 값 복사
    - Project URL → `SUPABASE_URL`
-   - `service_role` 키 (secret) → `SUPABASE_SERVICE_KEY` (절대 프론트엔드/깃에 넣지 말 것)
+   - Project Settings → API Keys 의 `service_role` 키(Legacy 탭, eyJ...) 또는 Secret key(sb_secret_...) → `SUPABASE_SERVICE_KEY` (절대 프론트엔드/깃에 넣지 말 것)
 4. Render 대시보드 → 서비스 → **Environment** 에 위 두 값 추가 → 저장 (자동 재배포)
 5. `https://<서비스주소>/year-end-party/` 접속해 테스트 제출 → Supabase **Table Editor → rsvps** 에서 확인
 

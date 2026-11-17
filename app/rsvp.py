@@ -23,11 +23,11 @@ def _cfg():
     key = os.environ.get("SUPABASE_SERVICE_KEY", "")
     if not url or not key:
         raise HTTPException(503, "RSVP 저장소가 아직 설정되지 않았어요.")
-    headers = {
-        "apikey": key,
-        "Authorization": f"Bearer {key}",
-        "Content-Type": "application/json",
-    }
+    headers = {"apikey": key, "Content-Type": "application/json"}
+    # 예전 service_role 키(JWT, eyJ...)는 Authorization 헤더도 필요하다.
+    # 새 secret 키(sb_secret_...)는 JWT가 아니라서 apikey 헤더에만 넣는다.
+    if key.startswith("eyJ"):
+        headers["Authorization"] = f"Bearer {key}"
     return f"{url}/rest/v1/{TABLE}", headers
 
 
